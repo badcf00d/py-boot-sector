@@ -8,11 +8,14 @@ import tkinter as tk
 from tkinter import filedialog
 
 
+#   Check if we have admin / root privileges
 try:
+    # Unix
     if os.geteuid() != 0:
         input("\nThis script needs root permissions to write a boot sector, please run it again with sudo")
         raise SystemExit
 except AttributeError:
+    # Windows
     if ctypes.windll.shell32.IsUserAnAdmin() == 0:
         input("\nThis script needs admin permissions to write a boot sector, please run it again as administrator")
         raise SystemExit
@@ -90,7 +93,7 @@ if sys.platform.startswith('linux') or sys.platform.startswith('darwin'):
                 regex = re.search("(?:disk *).*", output.stdout).group()
 
                 #   This will show us our human-friendly device name like Sandisk USB Drive or whatever
-                confirm = input("You selected \"%s\" is this correct? (y/n)" % regex[15:])
+                confirm = input("You selected \"%s\" is that correct? (y/n)" % regex[15:])
             else:
                 targetDrive = part.device[:10]
 
@@ -99,9 +102,7 @@ if sys.platform.startswith('linux') or sys.platform.startswith('darwin'):
                     shell=True, universal_newlines=True, stdout=subprocess.PIPE)
 
                 #   This will show us our human-friendly device name like Sandisk USB Drive or whatever
-                confirm = input("You selected \"%s\" is this correct? (y/n)" % output.stdout[24:].strip())
-
-            print(targetDrive)
+                confirm = input("You selected \"%s\" is that correct? (y/n)" % output.stdout[24:].strip())
 
             if confirm != "y":
                 raise SystemExit
@@ -123,7 +124,7 @@ elif sys.platform.startswith('win32'):
 
                 if targetDirectory[0] == logicalDisk.Caption[0]:
                     #   This will show us our human-friendly device name like Sandisk USB Drive or whatever
-                    confirm = input("\nYou selected \"%s\" is this correct? (y/n)" % physicalDisk.Caption)
+                    confirm = input("\nYou selected \"%s\" is that correct? (y/n)" % physicalDisk.Caption)
 
                     if confirm == "y":
                         targetDrive = physicalDisk.DeviceID
@@ -188,5 +189,19 @@ if (fileExtension == ".img"):
 #   Write our new bootloader
 print("New Bootloader: \n")
 print(newBootloader.hex())
-disk.seek(0)
-disk.write(newBootloader)
+
+if sys.platform.startswith('linux') or sys.platform.startswith('darwin'):
+    #   Create the backup file
+    newBootloaderName = "bootsector-"
+    newBootloaderName += strftime("%d-%m-%Y-%H-%M-%S", gmtime())
+    newBootloaderName += ".imgtmp"
+    newBootloaderFile = open(newBootloaderName, "wb")
+    newBootloaderFile.write(newBootloader)
+    newBootloaderFile.close()
+    subprocess.run("sudo dd if=\"" + os.getcwd() + "/" + newBootloaderName + "\" of=\"" + targetDrive + "\" bs=512 count=1 ", shell=True)
+    os.remove(os.getcwd() + "/" + newBootloaderName)
+else:
+    disk.seek(0)
+    disk.write(newBootloader)
+
+disk.close()
