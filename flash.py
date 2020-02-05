@@ -3,8 +3,19 @@ import os
 import sys
 import subprocess
 import re
+import ctypes
 import tkinter as tk
 from tkinter import filedialog
+
+
+try:
+    if os.geteuid() != 0:
+        input("\nThis script needs root permissions to write a boot sector, please run it again with sudo")
+        raise SystemExit
+except AttributeError:
+    if ctypes.windll.shell32.IsUserAnAdmin() == 0:
+        input("\nThis script needs admin permissions to write a boot sector, please run it again as administrator")
+        raise SystemExit
 
 
 #   Open up a dialog box to pick a file to flash
