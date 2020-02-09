@@ -104,6 +104,8 @@ if sys.platform.startswith('linux') or sys.platform.startswith('darwin'):
                 #   This will show us our human-friendly device name like Sandisk USB Drive or whatever
                 confirm = input("You selected \"%s\" is that correct? (y/n)" % output.stdout[24:].strip())
 
+                subprocess.run("diskutil unmount " + part.device, shell=True)
+
             if confirm != "y":
                 raise SystemExit
 
