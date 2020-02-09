@@ -190,18 +190,7 @@ if (fileExtension == ".img"):
 print("New Bootloader: \n")
 print(newBootloader.hex())
 
-if sys.platform.startswith('linux') or sys.platform.startswith('darwin'):
-    #   Create the backup file
-    newBootloaderName = "bootsector-"
-    newBootloaderName += strftime("%d-%m-%Y-%H-%M-%S", gmtime())
-    newBootloaderName += ".imgtmp"
-    newBootloaderFile = open(newBootloaderName, "wb")
-    newBootloaderFile.write(newBootloader)
-    newBootloaderFile.close()
-    subprocess.run("sudo dd if=\"" + os.getcwd() + "/" + newBootloaderName + "\" of=\"" + targetDrive + "\" bs=512 count=1 ", shell=True)
-    os.remove(os.getcwd() + "/" + newBootloaderName)
-else:
-    disk.seek(0)
-    disk.write(newBootloader)
+disk.seek(0)
+disk.write(newBootloader)
 
 disk.close()
