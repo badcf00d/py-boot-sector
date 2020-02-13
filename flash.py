@@ -1,13 +1,20 @@
+import sys
+#   Check if running in python 3
+if sys.version_info[0] < 3:
+    raw_input("\nThis program needs python 3, looks like you're using python " + str(sys.version_info[0]))
+    raise SystemExit
+
 from time import gmtime, strftime
 import os
-import sys
 import subprocess
 import re
 import ctypes
+from importlib import util
 import tkinter as tk
 from tkinter import filedialog
 
 
+'''
 #   Check if we have admin / root privileges
 try:
     # Unix
@@ -56,7 +63,7 @@ else:
 input("Now pick the drive (probably a USB stick) you want to flash, press enter to continue")
 targetDirectory = filedialog.askdirectory()
 targetDrive = ""
-
+'''
 
 
 
@@ -68,10 +75,15 @@ targetDrive = ""
 #   This whole block is to determine which physical drive matches the target directory
 #
 if sys.platform.startswith('linux') or sys.platform.startswith('darwin'):
+
+    #   Check that we have the requirements installed
+    if util.find_spec('psutil') == None:
+        input("\nPlease install the requirements e.g. pip install -r requirements-unix.txt")
+        raise SystemExit
     import psutil
 
     if targetDirectory == '/':
-        input(  "I'm not sure you want to flash your root drive with this, "
+        input(  "\nI'm not sure you want to flash your root drive with this, "
                 "That probably has your operating system on it, and you probably "
                 "won't be able to boot that operating system any more if you do this")
         raise SystemExit
@@ -111,10 +123,15 @@ if sys.platform.startswith('linux') or sys.platform.startswith('darwin'):
 
 
 elif sys.platform.startswith('win32'):
+
+    #   Check that we have the requirements installed
+    if (util.find_spec('wmi') == None) or (util.find_spec('pywin32') == None):
+        input("\nPlease install the requirements e.g. pip install -r requirements-win.txt")
+        raise SystemExit
     import wmi
 
     if targetDirectory[0] == 'C':
-        input(  "I'm not sure you want to flash the C drive with this, "
+        input(  "\nI'm not sure you want to flash the C drive with this, "
                 "That probably has your operating system on it, and you probably "
                 "won't be able to boot that operating system any more if you do this")
         raise SystemExit
@@ -135,13 +152,13 @@ elif sys.platform.startswith('win32'):
                         raise SystemExit
 
 else:
-    input("Not got a clue what operating system this is, please make a pull request to fix this")
+    input("\nNot got a clue what operating system this is, please make a pull request to fix this")
     raise SystemExit
 
 
 
 if targetDrive == "":
-    input(  "Hmm, couldn't find a drive matching that directory, please make an " 
+    input(  "\nHmm, couldn't find a drive matching that directory, please make an " 
             "issue for this, targetDirectory is: \"%s\"" % targetDirectory)
     raise SystemExit
 
