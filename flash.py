@@ -14,7 +14,6 @@ import tkinter as tk
 from tkinter import filedialog
 
 
-'''
 #   Check if we have admin / root privileges
 try:
     # Unix
@@ -63,7 +62,6 @@ else:
 input("Now pick the drive (probably a USB stick) you want to flash, press enter to continue")
 targetDirectory = filedialog.askdirectory()
 targetDrive = ""
-'''
 
 
 
