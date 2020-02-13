@@ -1,7 +1,7 @@
 import sys
 #   Check if running in python 3
 if sys.version_info[0] < 3:
-    raw_input("\nThis program needs python 3, looks like you're using python " + str(sys.version_info[0]))
+    raw_input("\nThis program needs python 3, looks like you're using python 2")
     raise SystemExit
 
 from time import gmtime, strftime
